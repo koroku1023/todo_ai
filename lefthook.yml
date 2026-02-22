@@ -1,0 +1,5 @@
+pre-commit:
+  commands:
+    shared-kotlin-check:
+      glob: "shared/**/*.{kt,kts}"
+      run: npx moon run shared:lint

@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@moonrepo/cli": "^2.0.1",
+    "lefthook": "^2.1.1"
+  }
+}
