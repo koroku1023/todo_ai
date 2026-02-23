@@ -1,0 +1,17 @@
+# detekt ルールの無効化設定
+# buildUponDefaultConfig = true により、デフォルト設定を継承しつつ以下を上書き
+
+naming:
+  # パッケージ名にアンダースコア（todo_ai）を含むため。ktlint と同様に無効化。
+  PackageNaming:
+    active: false
+
+  # KMP の expect/actual パターンで、Platform.ios.kt 等に AndroidPlatform 等のクラスを定義する構成のため。
+  # ファイル名とクラス名の一致を求めるルールは KMP では不適合。
+  MatchingDeclarationName:
+    active: false
+
+style:
+  # ファイル末尾の改行。spotlessApply で一括修正可能なため、ここでは無効化。
+  NewLineAtEndOfFile:
+    active: false
