@@ -11,6 +11,11 @@ naming:
   MatchingDeclarationName:
     active: false
 
+complexity:
+  LongParameterList:
+    functionThreshold: 10
+    constructorThreshold: 10
+
 style:
   # ファイル末尾の改行。spotlessApply で一括修正可能なため、ここでは無効化。
   NewLineAtEndOfFile:
