@@ -9,7 +9,7 @@ data class SubTask(
   val memo: String?,
   val startAt: Instant?,
   val endAt: Instant?,
-  val repeatDays: String?,
+  val repeatDays: List<String>?,
   val syncStatus: SyncStatus,
   val completedAt: Instant?,
   val createdAt: Instant,
@@ -25,7 +25,7 @@ data class SubTask(
       memo: String? = null,
       startAt: Instant? = null,
       endAt: Instant? = null,
-      repeatDays: String? = null
+      repeatDays: List<String>? = null
     ): SubTask {
       return SubTask(
         id = id,
@@ -60,7 +60,7 @@ data class SubTask(
     memo: String?,
     startAt: Instant?,
     endAt: Instant?,
-    repeatDays: String?,
+    repeatDays: List<String>?,
     now: Instant
   ): SubTask {
     return copy(

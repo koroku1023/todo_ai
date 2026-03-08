@@ -58,43 +58,23 @@ class ProjectTest {
   }
 
   @Test
-  fun testToggleFavorite() {
-    val project = Project.create(id, title, now)
+  fun testUpdate() {
+    val project = Project.create(id, title, now, "#FF0000")
     val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = project.toggleFavorite(updatedNow)
+    val result = project.update("新しいタイトル", "#00FF00", true, updatedNow)
 
+    assertEquals("新しいタイトル", result.title)
+    assertEquals("#00FF00", result.color)
     assertEquals(true, result.isFavorite)
     assertEquals(updatedNow, result.updatedAt)
     assertEquals(SyncStatus.PENDING, result.syncStatus)
   }
 
   @Test
-  fun testRename() {
-    val project = Project.create(id, title, now)
-    val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = project.rename("新しいタイトル", updatedNow)
-
-    assertEquals("新しいタイトル", result.title)
-    assertEquals(updatedNow, result.updatedAt)
-    assertEquals(SyncStatus.PENDING, result.syncStatus)
-  }
-
-  @Test
-  fun testChangeColor() {
-    val project = Project.create(id, title, now)
-    val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = project.changeColor("#00FF00", updatedNow)
-
-    assertEquals("#00FF00", result.color)
-    assertEquals(updatedNow, result.updatedAt)
-    assertEquals(SyncStatus.PENDING, result.syncStatus)
-  }
-
-  @Test
-  fun testChangeColorToNull() {
+  fun testUpdateColorToNull() {
     val project = Project.create(id, title, now, "#FF0000")
     val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = project.changeColor(null, updatedNow)
+    val result = project.update(title, null, false, updatedNow)
 
     assertEquals(null, result.color)
     assertEquals(updatedNow, result.updatedAt)

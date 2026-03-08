@@ -46,23 +46,21 @@ data class Project(
     return copy(completedAt = null, updatedAt = now, syncStatus = SyncStatus.PENDING)
   }
 
-  fun toggleFavorite(now: Instant): Project {
-    return copy(isFavorite = !isFavorite, updatedAt = now, syncStatus = SyncStatus.PENDING)
-  }
-
-  fun rename(newTitle: String, now: Instant): Project {
-    return copy(title = newTitle, updatedAt = now, syncStatus = SyncStatus.PENDING)
-  }
-
-  fun changeColor(newColor: String?, now: Instant): Project {
-    return copy(color = newColor, updatedAt = now, syncStatus = SyncStatus.PENDING)
-  }
-
   fun markAsDeleted(now: Instant): Project {
     return copy(deletedAt = now, updatedAt = now, syncStatus = SyncStatus.PENDING)
   }
 
   fun restore(now: Instant): Project {
     return copy(deletedAt = null, updatedAt = now, syncStatus = SyncStatus.PENDING)
+  }
+
+  fun update(title: String, color: String?, isFavorite: Boolean, now: Instant): Project {
+    return copy(
+      title = title,
+      color = color,
+      isFavorite = isFavorite,
+      updatedAt = now,
+      syncStatus = SyncStatus.PENDING,
+    )
   }
 }

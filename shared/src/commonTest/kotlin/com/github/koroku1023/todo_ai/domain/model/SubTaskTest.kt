@@ -36,12 +36,12 @@ class SubTaskTest {
     val memo = "メモ"
     val startAt = Instant.fromEpochMilliseconds(1000)
     val endAt = Instant.fromEpochMilliseconds(2000)
-    val subTask = SubTask.create(id, taskId, title, now, memo, startAt, endAt, "Mon,Fri")
+    val subTask = SubTask.create(id, taskId, title, now, memo, startAt, endAt, listOf("Mon", "Fri"))
 
     assertEquals(memo, subTask.memo)
     assertEquals(startAt, subTask.startAt)
     assertEquals(endAt, subTask.endAt)
-    assertEquals("Mon,Fri", subTask.repeatDays)
+    assertEquals(listOf("Mon", "Fri"), subTask.repeatDays)
   }
 
   @Test
@@ -75,7 +75,7 @@ class SubTaskTest {
     val newMemo = "新しいメモ"
     val newStartAt = Instant.fromEpochMilliseconds(2000)
     val newEndAt = Instant.fromEpochMilliseconds(3000)
-    val newRepeatDays = "Tue,Thu"
+    val newRepeatDays = listOf("Tue", "Thu")
     val result = subTask.updateDetails(newTitle, newMemo, newStartAt, newEndAt, newRepeatDays, updatedNow)
 
     assertEquals(newTitle, result.title)

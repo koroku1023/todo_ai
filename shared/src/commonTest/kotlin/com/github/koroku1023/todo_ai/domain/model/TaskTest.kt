@@ -18,6 +18,7 @@ class TaskTest {
     assertEquals(id, task.id)
     assertEquals(projectId, task.projectId)
     assertEquals(title, task.title)
+    assertEquals(null, task.memo)
     assertEquals(null, task.color)
     assertEquals(SyncStatus.PENDING, task.syncStatus)
     assertEquals(now, task.createdAt)
@@ -59,47 +60,49 @@ class TaskTest {
   }
 
   @Test
-  fun testRename() {
-    val task = Task.create(id, projectId, title, now)
+  fun testUpdate() {
+    val task = Task.create(id, projectId, title, now, "#FF0000")
+    val newProjectId = "770e8400-e29b-41d4-a716-446655440002"
     val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = task.rename("新しいタスク", updatedNow)
+    val result = task.update("新しいタスク", null, "#00FF00", newProjectId, updatedNow)
 
     assertEquals("新しいタスク", result.title)
-    assertEquals(updatedNow, result.updatedAt)
-    assertEquals(SyncStatus.PENDING, result.syncStatus)
-  }
-
-  @Test
-  fun testChangeColor() {
-    val task = Task.create(id, projectId, title, now)
-    val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = task.changeColor("#00FF00", updatedNow)
-
+    assertEquals(null, result.memo)
     assertEquals("#00FF00", result.color)
+    assertEquals(newProjectId, result.projectId)
     assertEquals(updatedNow, result.updatedAt)
     assertEquals(SyncStatus.PENDING, result.syncStatus)
   }
 
   @Test
-  fun testChangeColorToNull() {
+  fun testUpdateColorToNull() {
     val task = Task.create(id, projectId, title, now, "#FF0000")
     val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = task.changeColor(null, updatedNow)
+    val result = task.update(title, null, null, projectId, updatedNow)
 
     assertEquals(null, result.color)
     assertEquals(updatedNow, result.updatedAt)
   }
 
   @Test
-  fun testMoveToProject() {
+  fun testUpdateWithMemo() {
     val task = Task.create(id, projectId, title, now)
-    val newProjectId = "770e8400-e29b-41d4-a716-446655440002"
     val updatedNow = Instant.fromEpochMilliseconds(1000)
-    val result = task.moveToProject(newProjectId, updatedNow)
+    val result = task.update(title, "メモ内容", null, projectId, updatedNow)
 
-    assertEquals(newProjectId, result.projectId)
+    assertEquals("メモ内容", result.memo)
     assertEquals(updatedNow, result.updatedAt)
-    assertEquals(SyncStatus.PENDING, result.syncStatus)
+  }
+
+  @Test
+  fun testUpdateMemoToNull() {
+    val task = Task.create(id, projectId, title, now)
+    val withMemo = task.update(title, "メモ内容", null, projectId, now)
+    val updatedNow = Instant.fromEpochMilliseconds(1000)
+    val result = withMemo.update(title, null, null, projectId, updatedNow)
+
+    assertEquals(null, result.memo)
+    assertEquals(updatedNow, result.updatedAt)
   }
 
   @Test

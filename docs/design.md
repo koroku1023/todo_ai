@@ -43,6 +43,7 @@
 | ID             | id           | TEXT |  ◯  |  -  |  ×   | -          | UUID v4             |
 | プロジェクトID | project_id   | TEXT |  -  |  ◯  |  ×   | -          | projects.id参照     |
 | タイトル       | title        | TEXT |  -  |  -  |  ×   | -          | 必須項目            |
+| 詳細メモ       | memo         | TEXT |  -  |  -  |  ◯   | NULL       | 自由記述            |
 | カラー         | color        | TEXT |  -  |  -  |  ◯   | NULL       | タスク個別色        |
 | 同期状態       | sync_status  | TEXT |  -  |  -  |  ×   | PENDING    | 'PENDING', 'SYNCED' |
 | 完了日時       | completed_at | TEXT |  -  |  -  |  ◯   | NULL       | ISO8601             |
@@ -142,6 +143,7 @@ erDiagram
         string id PK
         string project_id FK
         string title
+        string memo
         string color
         string sync_status
         string completed_at
@@ -244,19 +246,16 @@ erDiagram
 | `updatedAt`      | `Date`                 | 最終更新日時                   |
 | `deletedAt`      | `Date \| null`         | 論理削除日時 (`null` なら有効) |
 
-| **メソッド名**         | **引数**                                               | **戻り値** | **処理内容**                                               |
-| ---------------------- | ------------------------------------------------------ | ---------- | ---------------------------------------------------------- |
-| `create` (static)      | `id: string`, `title: string`, `color: string \| null` | `Project`  | 新規プロジェクトインスタンスを生成するファクトリメソッド。 |
-| `reconstruct` (static) | `data: { ... }`                                        | `Project`  | DB等のデータからインスタンスを再構成するメソッド。         |
-| `isCompleted`          | なし                                                   | `boolean`  | `completedAt` が存在するか判定する。                       |
-| `isDeleted`            | なし                                                   | `boolean`  | `deletedAt` が存在するか判定する。                         |
-| `complete`             | なし                                                   | `void`     | `completedAt` と `updatedAt` を現在日時に更新し、完了状態にする。 |
-| `unComplete`           | なし                                                   | `void`     | `completedAt` を `null` に戻し、未完了状態にする。         |
-| `toggleFavorite`       | なし                                                   | `void`     | `isFavorite` の値を反転させる。                            |
-| `rename`               | `newTitle: string`                                     | `void`     | `title` を変更し、`updatedAt` を更新する。                 |
-| `changeColor`          | `newColor: string \| null`                             | `void`     | `color` を変更し、`updatedAt` を更新する。                 |
-| `markAsDeleted`        | なし                                                   | `void`     | `deletedAt` に現在日時をセットし、論理削除状態にする。     |
-| `restore`              | なし                                                   | `void`     | `deletedAt` を `null` に戻し、削除を取り消す。             |
+| **メソッド名**    | **引数**                                        | **戻り値** | **処理内容**                                               |
+| ----------------- | ----------------------------------------------- | ---------- | ---------------------------------------------------------- |
+| `create` (static) | `id`, `title`, `color?`                         | `Project`  | 新規プロジェクトを生成するファクトリメソッド。             |
+| `isCompleted`     | なし                                            | `boolean`  | `completedAt` が存在するか判定する。                       |
+| `isDeleted`       | なし                                            | `boolean`  | `deletedAt` が存在するか判定する。                         |
+| `complete`        | `now: Date`                                     | `Project`  | `completedAt` を設定し、完了状態にする。                   |
+| `unComplete`      | `now: Date`                                     | `Project`  | `completedAt` を `null` に戻し、未完了状態にする。         |
+| `update`          | `title`, `color?`, `isFavorite`, `now`          | `Project`  | タイトル・カラー・お気に入りを一括更新する。               |
+| `markAsDeleted`   | `now: Date`                                     | `Project`  | `deletedAt` に現在日時をセットし、論理削除状態にする。     |
+| `restore`         | `now: Date`                                     | `Project`  | `deletedAt` を `null` に戻し、削除を取り消す。             |
 
 ##### Task
 
@@ -265,25 +264,23 @@ erDiagram
 | `id`             | `string`            | タスクの一意なID (UUID)                         |
 | `projectId`      | `string`            | 親プロジェクトのID                              |
 | `title`          | `string`            | タスクのタイトル                                |
+| `memo`           | `string \| null`    | 詳細メモ（作成時は null、update で変更可能）    |
 | `color`          | `string \| null`    | タスクの個別カラー (基本はプロジェクト色を継承) |
 | `completedAt`    | `Date \| null`      | 完了日時 (`null` なら未完了)                    |
 | `createdAt`      | `Date`              | 作成日時                                        |
 | `updatedAt`      | `Date`              | 最終更新日時                                    |
 | `deletedAt`      | `Date \| null`      | 論理削除日時 (`null` なら有効)                  |
 
-| **メソッド名**         | **引数**                      | **戻り値** | **処理内容**                       |
-| ---------------------- | ----------------------------- | ---------- | ---------------------------------- |
-| `create` (static)      | `id`, `projectId`, `title`... | `Task`     | ファクトリメソッド。               |
-| `reconstruct` (static) | `data: { ... }`               | `Task`     | DBデータからの再構成。             |
-| `isCompleted`          | なし                          | `boolean`  | `completedAt` の有無判定。         |
-| `isDeleted`            | なし                          | `boolean`  | `deletedAt` の有無判定。           |
-| `complete`             | なし                          | `void`     | `completedAt` を設定し完了にする。 |
-| `uncomplete`           | なし                          | `void`     | `completedAt` を解除する。         |
-| `rename`               | `newTitle: string`            | `void`     | タイトル変更。                     |
-| `changeColor`          | `newColor: string \| null`    | `void`     | カラー変更。                       |
-| `moveToProject`        | `newProjectId: string`        | `void`     | 所属プロジェクトを変更する。       |
-| `markAsDeleted`        | なし                          | `void`     | 論理削除する。                     |
-| `restore`              | なし                          | `void`     | 論理削除を取り消す。               |
+| **メソッド名**    | **引数**                                      | **戻り値** | **処理内容**                                          |
+| ----------------- | --------------------------------------------- | ---------- | ----------------------------------------------------- |
+| `create` (static) | `id`, `projectId`, `title`, `color?`          | `Task`     | ファクトリメソッド。memo は null 固定。               |
+| `isCompleted`     | なし                                          | `boolean`  | `completedAt` の有無判定。                            |
+| `isDeleted`       | なし                                          | `boolean`  | `deletedAt` の有無判定。                              |
+| `complete`        | `now: Date`                                   | `Task`     | `completedAt` を設定し完了にする。                    |
+| `unComplete`      | `now: Date`                                   | `Task`     | `completedAt` を解除する。                            |
+| `update`          | `title`, `memo?`, `color?`, `projectId`, `now` | `Task`     | タイトル・メモ・カラー・プロジェクトを一括更新する。  |
+| `markAsDeleted`   | `now: Date`                                   | `Task`     | 論理削除する。                                        |
+| `restore`         | `now: Date`                                   | `Task`     | 論理削除を取り消す。                                  |
 
 ##### SubTask
 

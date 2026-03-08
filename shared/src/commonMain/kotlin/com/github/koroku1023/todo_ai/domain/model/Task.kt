@@ -6,6 +6,7 @@ data class Task(
   val id: String,
   val projectId: String,
   val title: String,
+  val memo: String?,
   val color: String?,
   val syncStatus: SyncStatus,
   val createdAt: Instant,
@@ -20,6 +21,7 @@ data class Task(
         id = id,
         projectId = projectId,
         title = title,
+        memo = null,
         color = color,
         syncStatus = SyncStatus.PENDING,
         createdAt = now,
@@ -41,23 +43,22 @@ data class Task(
     return copy(completedAt = null, updatedAt = now, syncStatus = SyncStatus.PENDING)
   }
 
-  fun rename(newTitle: String, now: Instant): Task {
-    return copy(title = newTitle, updatedAt = now, syncStatus = SyncStatus.PENDING)
-  }
-
-  fun changeColor(newColor: String?, now: Instant): Task {
-    return copy(color = newColor, updatedAt = now, syncStatus = SyncStatus.PENDING)
-  }
-
-  fun moveToProject(newProjectId: String, now: Instant): Task {
-    return copy(projectId = newProjectId, updatedAt = now, syncStatus = SyncStatus.PENDING)
-  }
-
   fun markAsDeleted(now: Instant): Task {
     return copy(deletedAt = now, updatedAt = now, syncStatus = SyncStatus.PENDING)
   }
 
   fun restore(now: Instant): Task {
     return copy(deletedAt = null, updatedAt = now, syncStatus = SyncStatus.PENDING)
+  }
+
+  fun update(title: String, memo: String?, color: String?, projectId: String, now: Instant): Task {
+    return copy(
+      title = title,
+      memo = memo,
+      color = color,
+      projectId = projectId,
+      updatedAt = now,
+      syncStatus = SyncStatus.PENDING,
+    )
   }
 }
