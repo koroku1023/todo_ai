@@ -1,0 +1,19 @@
+tasks:
+  format:
+    command: "./gradlew :shared:spotlessApply"
+    options:
+      runFromWorkspaceRoot: true
+
+  lint:
+    command: "./gradlew :shared:spotlessCheck :shared:detekt"
+    inputs:
+      - "src/**/*"
+    options:
+      runFromWorkspaceRoot: true
+
+  test:
+    command: "./gradlew :shared:jvmTest"
+    inputs:
+      - "src/**/*"
+    options:
+      runFromWorkspaceRoot: true
